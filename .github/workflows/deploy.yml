@@ -94,11 +94,11 @@ jobs:
           #Set dockerhub project (replace "bartfastiel/java-capstone-project.de-example-app")
           #Set IP (replace "10.0.1.99" with your ip address)
           script: |
-            docker stop flightchecker
-            docker rm flightchecker
-            docker run --pull=always --name flightchecker --network capstones --ip 10.0.5.19 --restart always --detach --env MONGO_DB_URI=${{ secrets.MONGO_DB_URI }} shreazy/flightchecker:latest
+            docker stop cgn-java-23-2-sharoz
+            docker rm cgn-java-23-2-sharoz
+            docker run --pull=always --name cgn-java-23-2-sharoz --network capstones --ip 10.0.5.19 --restart always --detach --env MONGO_DB_URI=${{ secrets.MONGO_DB_URI }} shreazy/flightchecker:latest
             sleep 15s
-            docker logs flightchecker
+            docker logs cgn-java-23-2-sharoz
 
       - name: Check the deployed service URL
         uses: jtalk/url-health-check-action@v3
