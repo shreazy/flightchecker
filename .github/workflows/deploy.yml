@@ -76,7 +76,7 @@ jobs:
         with:
           push: true
           #Set dockerhub project (replace "bartfastiel/java-capstone-project.de-example-app")
-          tags: shreazy/flightsrepo:latest
+          tags: shreazy/flightchecker:latest
           context: .
 
   deploy:
@@ -96,7 +96,7 @@ jobs:
           script: |
             sudo docker stop flightchecker
             sudo docker rm flightchecker
-            sudo docker run --pull=always --name flightchecker --network capstones --ip 10.0.5.19 --restart always --detach --env MONGO_DB_URI=${{ secrets.MONGO_DB_URI }} shreazy/flightsrepo:latest
+            sudo docker run --pull=always --name flightchecker --network capstones --ip 10.0.5.19 --restart always --detach --env MONGO_DB_URI=${{ secrets.MONGO_DB_URI }} shreazy/flightchecker:latest
             sleep 15s
             sudo docker logs flightchecker
 
