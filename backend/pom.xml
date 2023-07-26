@@ -29,9 +29,8 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
-		<groupId>de.flapdoodle.embed</groupId>
-			<artifactId>de.flapdoodle.embled.mongo.spring30x</artifactId>
-			<scope>test</scope>
+			<groupId>de.flapdoodle.embed</groupId>
+			<artifactId>de.flapdoodle.embed.mongo</artifactId>
 			<version>6.0.1</version>
 		</dependency>
 		<dependency>
