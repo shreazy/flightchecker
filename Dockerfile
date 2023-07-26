@@ -2,8 +2,6 @@ FROM openjdk:20
 
 ENV ENVIRONMENT=prod
 
-LABEL maintainer="sharozahmad2102@gmail.com"
-
 EXPOSE 8080
 
 ADD backend/target/FlightChecker.jar app.jar
