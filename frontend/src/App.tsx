@@ -1,35 +1,50 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+// Header component
+function Header() {
+    return <h1>Flight Search</h1>;
 }
 
-export default App
+// Search component
+function Search() {
+    const [flightNumber, setFlightNumber] = useState('');
+
+    const handleSearch = () => {
+        // This is where we will call the API to get the flight info
+        // For now, let's just log the flight number
+        console.log(flightNumber);
+    };
+
+    return (
+        <div>
+            <input
+                type="text"
+                value={flightNumber}
+                onChange={e => setFlightNumber(e.target.value)}
+                placeholder="Enter flight number"
+            />
+            <button onClick={handleSearch}>Search</button>
+        </div>
+    );
+}
+
+// FlightInfo component
+function FlightInfo() {
+    // This component will display the flight info
+    // For now, it's just a placeholder
+    return <div>Flight Info will be displayed here</div>;
+}
+
+// Main App component
+function App() {
+    return (
+        <div>
+            <Header />
+            <Search />
+            <FlightInfo />
+        </div>
+    );
+}
+
+export default App;
