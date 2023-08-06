@@ -1,6 +1,13 @@
-import { useState } from 'react'
-import './App.css'
-import { Button, Container, TextField, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import {Button, Container, TextField, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+styled(Typography)({
+    textAlign: 'center'
+});
+const SmallTableCell = styled(TableCell)({
+    fontSize: '0.7rem'
+});
 
 interface Flight {
     status: string;
@@ -11,12 +18,19 @@ interface Flight {
     arrivalAirport: string;
 }
 
-// Header component
 function Header() {
-    return <Typography component="h1" variant="h5">Flight Search</Typography>;
+    return (
+        <div style={{ textAlign: 'center', padding: '0px 0' }}>
+            <img src="/images/flightcheckerlogo.png" alt="logo"
+                 loading="lazy"
+                 style={{
+                     maxWidth: '350px',
+                     marginBottom: '5px'
+                 }}/>
+        </div>
+    );
 }
 
-// Search component
 interface SearchProps {
     onSearch: (flightNumber: string) => void;
 }
@@ -47,8 +61,7 @@ function Search({ onSearch }: SearchProps) {
                 type="submit"
                 fullWidth
                 variant="contained"
-                color="primary"
-                sx={{ mt: 3, mb: 2 }}
+                sx={{ mt: 3, mb: 2, backgroundColor: '#000', color: '#fff' }}
             >
                 Search
             </Button>
@@ -56,7 +69,7 @@ function Search({ onSearch }: SearchProps) {
     );
 }
 
-// FlightInfo component
+
 interface FlightInfoProps {
     flight: Flight;
 }
@@ -64,25 +77,21 @@ interface FlightInfoProps {
 function FlightInfo({ flight }: FlightInfoProps) {
     return (
         <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <Table sx={{ minWidth: 300 }} aria-label="simple table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Status</TableCell>
-                        <TableCell>Flight Number</TableCell>
-                        <TableCell>Arrival Time</TableCell>
-                        <TableCell>Departure Airport</TableCell>
-                        <TableCell>Terminal</TableCell>
-                        <TableCell>Arrival Airport</TableCell>
+                        <SmallTableCell>Status</SmallTableCell>
+                        <SmallTableCell>Flight</SmallTableCell>
+                        <SmallTableCell>Arrival</SmallTableCell>
+                        <SmallTableCell>Departure</SmallTableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     <TableRow>
-                        <TableCell>{flight.status}</TableCell>
-                        <TableCell>{flight.flightNumber}</TableCell>
-                        <TableCell>{flight.arrivalTime}</TableCell>
-                        <TableCell>{flight.departureAirport}</TableCell>
-                        <TableCell>{flight.terminal}</TableCell>
-                        <TableCell>{flight.arrivalAirport}</TableCell>
+                        <SmallTableCell>{flight.status}</SmallTableCell>
+                        <SmallTableCell>{flight.flightNumber}</SmallTableCell>
+                        <SmallTableCell>{flight.arrivalTime.split('T')[1].substring(0,5)}</SmallTableCell>
+                        <SmallTableCell>{flight.departureAirport}</SmallTableCell>
                     </TableRow>
                 </TableBody>
             </Table>
@@ -90,7 +99,6 @@ function FlightInfo({ flight }: FlightInfoProps) {
     );
 }
 
-// Main App component
 function App() {
     const [flight, setFlight] = useState<Flight | null>(null);
 
