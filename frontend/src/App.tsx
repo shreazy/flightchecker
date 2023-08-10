@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import {Button, Container, TextField, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-} from '@mui/material';
+import { Button, Container, TextField, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { styled } from '@mui/material/styles';
+
 styled(Typography)({
     textAlign: 'center'
 });
+
 const SmallTableCell = styled(TableCell)({
     fontSize: '0.7rem'
 });
@@ -26,7 +27,7 @@ function Header() {
                  style={{
                      maxWidth: '350px',
                      marginBottom: '5px'
-                 }}/>
+                 }} />
         </div>
     );
 }
@@ -69,7 +70,6 @@ function Search({ onSearch }: SearchProps) {
     );
 }
 
-
 interface FlightInfoProps {
     flight: Flight;
 }
@@ -90,7 +90,7 @@ function FlightInfo({ flight }: FlightInfoProps) {
                     <TableRow>
                         <SmallTableCell>{flight.status}</SmallTableCell>
                         <SmallTableCell>{flight.flightNumber}</SmallTableCell>
-                        <SmallTableCell>{flight.arrivalTime.split('T')[1].substring(0,5)}</SmallTableCell>
+                        <SmallTableCell>{flight.arrivalTime.split('T')[1].substring(0, 5)}</SmallTableCell>
                         <SmallTableCell>{flight.departureAirport}</SmallTableCell>
                     </TableRow>
                 </TableBody>
@@ -103,14 +103,29 @@ function App() {
     const [flight, setFlight] = useState<Flight | null>(null);
 
     const handleSearch = (flightNumber: string) => {
-        setFlight({
-            status: "",
-            flightNumber: flightNumber,
-            arrivalTime: "2023-07-27T09:05:00",
-            departureAirport: "Hamburg",
-            terminal: "1",
-            arrivalAirport: "Berlin"
-        });
+        // Fetch flight data from the backend
+        fetch(`http://localhost:8080/flights/${flightNumber}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Assuming the backend returns a list and we're interested in the first flight
+                const backendFlight = data[0];
+                setFlight({
+                    status: backendFlight.status,
+                    flightNumber: backendFlight.flightNumber,
+                    arrivalTime: backendFlight.scheduledArrival, // Adjust based on the backend's response structure
+                    departureAirport: backendFlight.departureAirport,
+                    terminal: backendFlight.terminal,
+                    arrivalAirport: backendFlight.arrivalAirport
+                });
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error.message);
+            });
     };
 
     return (
