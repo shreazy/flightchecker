@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Button, TextField, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle, Container, Paper, Typography, Grid } from '@mui/material';
+import { Button, TextField, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle, Container, Paper, Typography, Grid, Box } from '@mui/material';
 
 type Flight = {
     id: string;
@@ -23,7 +23,29 @@ type FlightWithoutId = {
 };
 
 function App() {
-    const [flights, setFlights] = useState<Flight[]>([]);
+    const [flights, setFlights] = useState<Flight[]>([
+        {
+            id: '1',
+            flightNumber: 'LH123',
+            departureAirport: 'FRA',
+            arrivalAirport: 'JFK',
+            scheduledDeparture: '2023-08-14T10:00:00',
+            scheduledArrival: '2023-08-14T14:00:00',
+            terminal: 'A',
+            userId: 'user1'
+        },
+        {
+            id: '2',
+            flightNumber: 'BA456',
+            departureAirport: 'LHR',
+            arrivalAirport: 'DXB',
+            scheduledDeparture: '2023-08-15T12:00:00',
+            scheduledArrival: '2023-08-15T20:00:00',
+            terminal: 'B',
+            userId: 'user2'
+        }
+    ]);
+
     const [open, setOpen] = useState(false);
     const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
     const [newFlight, setNewFlight] = useState<FlightWithoutId>({
@@ -73,23 +95,26 @@ function App() {
 
     return (
         <Container>
-            <Typography variant="h4" align="center" gutterBottom>Flight Management</Typography>
+            <Box sx={{ mt: 4, mb: 4 }}>
+                <Typography variant="h4" align="center" gutterBottom>Flight Management</Typography>
+            </Box>
             <Grid container spacing={3}>
-                <Grid item xs={12}>
-                    <Paper elevation={3}>
+                <Grid item xs={12} md={6}>
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#f5f5f5' }}>
+                        <Typography variant="h6" align="center" gutterBottom>Existing Flights</Typography>
                         <List>
                             {flights.map(flight => (
-                                <ListItem key={flight.id}>
+                                <ListItem key={flight.id} style={{ backgroundColor: '#e0e0e0', margin: '10px 0' }}>
                                     <ListItemText primary={flight.flightNumber} secondary={`${flight.departureAirport} to ${flight.arrivalAirport}`} />
-                                    <Button onClick={() => handleOpen(flight)}>Edit</Button>
-                                    <Button onClick={() => handleDeleteFlight(flight.id)}>Delete</Button>
+                                    <Button variant="outlined" color="primary" onClick={() => handleOpen(flight)}>Edit</Button>
+                                    <Button variant="outlined" color="secondary" onClick={() => handleDeleteFlight(flight.id)}>Delete</Button>
                                 </ListItem>
                             ))}
                         </List>
                     </Paper>
                 </Grid>
-                <Grid item xs={12}>
-                    <Paper elevation={3} style={{ padding: '20px' }}>
+                <Grid item xs={12} md={6}>
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#f5f5f5' }}>
                         <Typography variant="h6" align="center" gutterBottom>Add New Flight</Typography>
                         <TextField label="Flight Number" value={newFlight.flightNumber} onChange={e => setNewFlight(prev => ({ ...prev, flightNumber: e.target.value }))} fullWidth />
                         <TextField label="Departure Airport" value={newFlight.departureAirport} onChange={e => setNewFlight(prev => ({ ...prev, departureAirport: e.target.value }))} fullWidth />
