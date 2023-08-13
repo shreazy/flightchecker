@@ -1,123 +1,122 @@
-import React, { useState } from 'react';
-import {Button, Container, TextField, Typography, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
-styled(Typography)({
-    textAlign: 'center'
-});
-const SmallTableCell = styled(TableCell)({
-    fontSize: '0.7rem'
-});
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Button, TextField, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle, Container, Paper, Typography, Grid } from '@mui/material';
 
-interface Flight {
-    status: string;
+type Flight = {
+    id: string;
     flightNumber: string;
-    arrivalTime: string;
     departureAirport: string;
-    terminal: string;
     arrivalAirport: string;
-}
+    scheduledDeparture: string;
+    scheduledArrival: string;
+    terminal: string;
+    userId: string;
+};
 
-function Header() {
-    return (
-        <div style={{ textAlign: 'center', padding: '0px 0' }}>
-            <img src="/images/flightcheckerlogo.png" alt="logo"
-                 loading="lazy"
-                 style={{
-                     maxWidth: '350px',
-                     marginBottom: '5px'
-                 }}/>
-        </div>
-    );
-}
-
-interface SearchProps {
-    onSearch: (flightNumber: string) => void;
-}
-
-function Search({ onSearch }: SearchProps) {
-    const [flightNumber, setFlightNumber] = useState('');
-
-    const handleSearch = (event: React.FormEvent) => {
-        event.preventDefault();
-        onSearch(flightNumber);
-    };
-
-    return (
-        <Box component="form" onSubmit={handleSearch} noValidate sx={{ mt: 1 }}>
-            <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="flightNumber"
-                label="Flight Number"
-                name="flightNumber"
-                autoFocus
-                value={flightNumber}
-                onChange={e => setFlightNumber(e.target.value)}
-            />
-            <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{ mt: 3, mb: 2, backgroundColor: '#000', color: '#fff' }}
-            >
-                Search
-            </Button>
-        </Box>
-    );
-}
-
-
-interface FlightInfoProps {
-    flight: Flight;
-}
-
-function FlightInfo({ flight }: FlightInfoProps) {
-    return (
-        <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 300 }} aria-label="simple table">
-                <TableHead>
-                    <TableRow>
-                        <SmallTableCell>Status</SmallTableCell>
-                        <SmallTableCell>Flight</SmallTableCell>
-                        <SmallTableCell>Arrival</SmallTableCell>
-                        <SmallTableCell>Departure</SmallTableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    <TableRow>
-                        <SmallTableCell>{flight.status}</SmallTableCell>
-                        <SmallTableCell>{flight.flightNumber}</SmallTableCell>
-                        <SmallTableCell>{flight.arrivalTime.split('T')[1].substring(0,5)}</SmallTableCell>
-                        <SmallTableCell>{flight.departureAirport}</SmallTableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
-        </TableContainer>
-    );
-}
+type FlightWithoutId = {
+    flightNumber: string;
+    departureAirport: string;
+    arrivalAirport: string;
+    scheduledDeparture: string;
+    scheduledArrival: string;
+    terminal: string;
+};
 
 function App() {
-    const [flight, setFlight] = useState<Flight | null>(null);
+    const [flights, setFlights] = useState<Flight[]>([]);
+    const [open, setOpen] = useState(false);
+    const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
+    const [newFlight, setNewFlight] = useState<FlightWithoutId>({
+        flightNumber: '',
+        departureAirport: '',
+        arrivalAirport: '',
+        scheduledDeparture: '',
+        scheduledArrival: '',
+        terminal: ''
+    });
 
-    const handleSearch = (flightNumber: string) => {
-        setFlight({
-            status: "",
-            flightNumber: flightNumber,
-            arrivalTime: "2023-07-27T09:05:00",
-            departureAirport: "Hamburg",
-            terminal: "1",
-            arrivalAirport: "Berlin"
+    useEffect(() => {
+        axios.get('/api/flights').then(response => {
+            setFlights(response.data);
+        });
+    }, []);
+
+    const handleOpen = (flight: Flight) => {
+        setSelectedFlight(flight);
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedFlight(null);
+    };
+
+    const handleAddFlight = () => {
+        axios.post('/api/flights', newFlight).then(response => {
+            setFlights(response.data);
+        });
+    };
+
+    const handleUpdateFlight = (id: string) => {
+        if (selectedFlight) {
+            axios.put(`/api/flights/${id}`, selectedFlight).then(response => {
+                setFlights(prevFlights => prevFlights.map(flight => flight.id === id ? response.data : flight));
+            });
+        }
+    };
+
+    const handleDeleteFlight = (id: string) => {
+        axios.delete(`/api/flights/${id}`).then(() => {
+            setFlights(prevFlights => prevFlights.filter(flight => flight.id !== id));
         });
     };
 
     return (
-        <Container component="main" maxWidth="xs">
-            <Header />
-            <Search onSearch={handleSearch} />
-            {flight && <FlightInfo flight={flight} />}
+        <Container>
+            <Typography variant="h4" align="center" gutterBottom>Flight Management</Typography>
+            <Grid container spacing={3}>
+                <Grid item xs={12}>
+                    <Paper elevation={3}>
+                        <List>
+                            {flights.map(flight => (
+                                <ListItem key={flight.id}>
+                                    <ListItemText primary={flight.flightNumber} secondary={`${flight.departureAirport} to ${flight.arrivalAirport}`} />
+                                    <Button onClick={() => handleOpen(flight)}>Edit</Button>
+                                    <Button onClick={() => handleDeleteFlight(flight.id)}>Delete</Button>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Paper>
+                </Grid>
+                <Grid item xs={12}>
+                    <Paper elevation={3} style={{ padding: '20px' }}>
+                        <Typography variant="h6" align="center" gutterBottom>Add New Flight</Typography>
+                        <TextField label="Flight Number" value={newFlight.flightNumber} onChange={e => setNewFlight(prev => ({ ...prev, flightNumber: e.target.value }))} fullWidth />
+                        <TextField label="Departure Airport" value={newFlight.departureAirport} onChange={e => setNewFlight(prev => ({ ...prev, departureAirport: e.target.value }))} fullWidth />
+                        <TextField label="Arrival Airport" value={newFlight.arrivalAirport} onChange={e => setNewFlight(prev => ({ ...prev, arrivalAirport: e.target.value }))} fullWidth />
+                        <TextField label="" type="datetime-local" value={newFlight.scheduledDeparture} onChange={e => setNewFlight(prev => ({ ...prev, scheduledDeparture: e.target.value }))} fullWidth />
+                        <TextField label="" type="datetime-local" value={newFlight.scheduledArrival} onChange={e => setNewFlight(prev => ({ ...prev, scheduledArrival: e.target.value }))} fullWidth />
+                        <TextField label="Terminal" value={newFlight.terminal} onChange={e => setNewFlight(prev => ({ ...prev, terminal: e.target.value }))} fullWidth />
+                        <Button variant="contained" color="primary" onClick={handleAddFlight} style={{ marginTop: '20px' }}>Add Flight</Button>
+                    </Paper>
+                </Grid>
+            </Grid>
+
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>Edit Flight</DialogTitle>
+                <DialogContent>
+                    <TextField label="Flight Number" value={selectedFlight?.flightNumber} onChange={e => setSelectedFlight(prev => ({ ...prev!, flightNumber: e.target.value }))} fullWidth />
+                    <TextField label="Departure Airport" value={selectedFlight?.departureAirport} onChange={e => setSelectedFlight(prev => ({ ...prev!, departureAirport: e.target.value }))} fullWidth />
+                    <TextField label="Arrival Airport" value={selectedFlight?.arrivalAirport} onChange={e => setSelectedFlight(prev => ({ ...prev!, arrivalAirport: e.target.value }))} fullWidth />
+                    <TextField label="Scheduled Departure" type="datetime-local" value={selectedFlight?.scheduledDeparture} onChange={e => setSelectedFlight(prev => ({ ...prev!, scheduledDeparture: e.target.value }))} fullWidth />
+                    <TextField label="Scheduled Arrival" type="datetime-local" value={selectedFlight?.scheduledArrival} onChange={e => setSelectedFlight(prev => ({ ...prev!, scheduledArrival: e.target.value }))} fullWidth />
+                    <TextField label="Terminal" value={selectedFlight?.terminal} onChange={e => setSelectedFlight(prev => ({ ...prev!, terminal: e.target.value }))} fullWidth />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={() => handleUpdateFlight(selectedFlight?.id || '')} color="primary">Save</Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }

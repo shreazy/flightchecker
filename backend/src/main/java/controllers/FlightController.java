@@ -1,29 +1,46 @@
 package controllers;
 
+import jakarta.validation.Valid;
 import models.Flight;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import models.FlightWithoutId;
+import services.FlightService;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
+@RequestMapping("/api/flights")
 public class FlightController {
 
-    @GetMapping("/flights/{flightNumber}")
-    public Flight getFlight(@PathVariable String flightNumber) {
-        // This is where we would call the service to get the flight data based on flightNumber
-        // For now, return a demo flight
-        Flight demoFlight = new Flight();
-        demoFlight.setFlightNumber("AB123");
-        demoFlight.setDepartureAirport("Hamburg");
-        demoFlight.setArrivalAirport("Berlin");
-        demoFlight.setScheduledDeparture(LocalDateTime.of(2023, 7, 27, 8, 0));
-        demoFlight.setActualDeparture(LocalDateTime.of(2023, 7, 27, 8, 5));
-        demoFlight.setScheduledArrival(LocalDateTime.of(2023, 7, 27, 9, 0));
-        demoFlight.setActualArrival(LocalDateTime.of(2023, 7, 27, 9, 5));
-        demoFlight.setTerminal("1");
+    private final FlightService flightService;
 
-        return demoFlight;
+    public FlightController(FlightService flightService) {
+        this.flightService = flightService;
+    }
+
+    @GetMapping
+    public List<Flight> listFlights() {
+        return this.flightService.list();
+    }
+
+    @GetMapping("/{id}")
+    public Flight getDetails(@PathVariable String id) {
+        return this.flightService.getDetails(id);
+    }
+
+    @PostMapping
+    public List<Flight> addFlight(@Valid @RequestBody FlightWithoutId newFlight) {
+        this.flightService.add(newFlight);
+        return this.flightService.list();
+    }
+
+    @PutMapping("/{id}")
+    public Flight update(@PathVariable String id, @Valid @RequestBody FlightWithoutId newFlight) {
+        return flightService.edit(id, newFlight);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable String id) {
+        flightService.delete(id);
     }
 }
