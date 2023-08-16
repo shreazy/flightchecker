@@ -23,29 +23,7 @@ type FlightWithoutId = {
 };
 
 function App() {
-    const [flights, setFlights] = useState<Flight[]>([
-        {
-            id: '1',
-            flightNumber: 'LH123',
-            departureAirport: 'FRA',
-            arrivalAirport: 'JFK',
-            scheduledDeparture: '2023-08-14T10:00:00',
-            scheduledArrival: '2023-08-14T14:00:00',
-            terminal: 'A',
-            userId: 'user1'
-        },
-        {
-            id: '2',
-            flightNumber: 'BA456',
-            departureAirport: 'LHR',
-            arrivalAirport: 'DXB',
-            scheduledDeparture: '2023-08-15T12:00:00',
-            scheduledArrival: '2023-08-15T20:00:00',
-            terminal: 'B',
-            userId: 'user2'
-        }
-    ]);
-
+    const [flights, setFlights] = useState<Flight[]>([]);
     const [open, setOpen] = useState(false);
     const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
     const [newFlight, setNewFlight] = useState<FlightWithoutId>({
@@ -75,7 +53,7 @@ function App() {
 
     const handleAddFlight = () => {
         axios.post('/api/flights', newFlight).then(response => {
-            setFlights(response.data);
+            setFlights(prevFlights => [...prevFlights, response.data]);
         });
     };
 
@@ -92,6 +70,7 @@ function App() {
             setFlights(prevFlights => prevFlights.filter(flight => flight.id !== id));
         });
     };
+
 
     return (
         <Container>

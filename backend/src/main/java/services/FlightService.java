@@ -3,7 +3,6 @@ package services;
 import exception.NoSuchFlightException;
 import models.Flight;
 import models.FlightWithoutId;
-import services.UuIdService;
 import repositories.FlightRepo;
 import org.springframework.stereotype.Service;
 
