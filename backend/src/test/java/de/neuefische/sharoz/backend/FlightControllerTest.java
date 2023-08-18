@@ -1,6 +1,6 @@
 package de.neuefische.sharoz.backend;
-import controllers.FlightController;
-import models.Flight;
+import de.neuefische.sharoz.backend.controllers.FlightController;
+import de.neuefische.sharoz.backend.models.Flight;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

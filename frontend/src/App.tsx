@@ -1,19 +1,8 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
 import { Button, TextField, List, ListItem, ListItemText, Dialog, DialogActions, DialogContent, DialogTitle, Container, Paper, Typography, Grid, Box } from '@mui/material';
 
 type Flight = {
     id: string;
-    flightNumber: string;
-    departureAirport: string;
-    arrivalAirport: string;
-    scheduledDeparture: string;
-    scheduledArrival: string;
-    terminal: string;
-    userId: string;
-};
-
-type FlightWithoutId = {
     flightNumber: string;
     departureAirport: string;
     arrivalAirport: string;
@@ -31,8 +20,7 @@ function App() {
             arrivalAirport: 'JFK',
             scheduledDeparture: '2023-08-14T10:00:00',
             scheduledArrival: '2023-08-14T14:00:00',
-            terminal: 'A',
-            userId: 'user1'
+            terminal: 'A'
         },
         {
             id: '2',
@@ -41,14 +29,13 @@ function App() {
             arrivalAirport: 'DXB',
             scheduledDeparture: '2023-08-15T12:00:00',
             scheduledArrival: '2023-08-15T20:00:00',
-            terminal: 'B',
-            userId: 'user2'
+            terminal: 'B'
         }
     ]);
 
     const [open, setOpen] = useState(false);
     const [selectedFlight, setSelectedFlight] = useState<Flight | null>(null);
-    const [newFlight, setNewFlight] = useState<FlightWithoutId>({
+    const [newFlight, setNewFlight] = useState<Omit<Flight, 'id'>>({
         flightNumber: '',
         departureAirport: '',
         arrivalAirport: '',
@@ -56,12 +43,6 @@ function App() {
         scheduledArrival: '',
         terminal: ''
     });
-
-    useEffect(() => {
-        axios.get('/api/flights').then(response => {
-            setFlights(response.data);
-        });
-    }, []);
 
     const handleOpen = (flight: Flight) => {
         setSelectedFlight(flight);
@@ -74,23 +55,25 @@ function App() {
     };
 
     const handleAddFlight = () => {
-        axios.post('/api/flights', newFlight).then(response => {
-            setFlights(response.data);
+        const id = Date.now().toString(); // Using current timestamp as a simple ID generator
+        setFlights([...flights, { ...newFlight, id }]);
+        setNewFlight({
+            flightNumber: '',
+            departureAirport: '',
+            arrivalAirport: '',
+            scheduledDeparture: '',
+            scheduledArrival: '',
+            terminal: ''
         });
     };
 
     const handleUpdateFlight = (id: string) => {
-        if (selectedFlight) {
-            axios.put(`/api/flights/${id}`, selectedFlight).then(response => {
-                setFlights(prevFlights => prevFlights.map(flight => flight.id === id ? response.data : flight));
-            });
-        }
+        setFlights(flights.map(flight => flight.id === id ? { ...selectedFlight! } : flight));
+        handleClose();
     };
 
     const handleDeleteFlight = (id: string) => {
-        axios.delete(`/api/flights/${id}`).then(() => {
-            setFlights(prevFlights => prevFlights.filter(flight => flight.id !== id));
-        });
+        setFlights(flights.filter(flight => flight.id !== id));
     };
 
     return (
@@ -100,11 +83,11 @@ function App() {
             </Box>
             <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
-                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#f5f5f5' }}>
+                    <Paper elevation={3} style={{ padding: '20px', backgroundColor: '#0b655a' }}>
                         <Typography variant="h6" align="center" gutterBottom>Existing Flights</Typography>
                         <List>
                             {flights.map(flight => (
-                                <ListItem key={flight.id} style={{ backgroundColor: '#e0e0e0', margin: '10px 0' }}>
+                                <ListItem key={flight.id} style={{ backgroundColor: '#b2c7c5', margin: '10px 0' }}>
                                     <ListItemText primary={flight.flightNumber} secondary={`${flight.departureAirport} to ${flight.arrivalAirport}`} />
                                     <Button variant="outlined" color="primary" onClick={() => handleOpen(flight)}>Edit</Button>
                                     <Button variant="outlined" color="secondary" onClick={() => handleDeleteFlight(flight.id)}>Delete</Button>
